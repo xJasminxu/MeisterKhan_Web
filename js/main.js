@@ -3,6 +3,7 @@
  * - Menu rendered from MENU data below (edit prices/dishes here)
  * - Live "open now" status (Europe/Berlin time)
  * - Mobile nav, scroll reveal, parallax, gallery lightbox, click-to-load map
+ * - Light/dark toggle (dark "Tusche" default, light "Zinnober"; remembers choice)
  */
 (function () {
   "use strict";
@@ -47,6 +48,7 @@
       "spice.levels": ["Nicht scharf", "Mild", "Extra scharf", "Asiatisch scharf", "Extrem scharf"],
       "vegan": "Vegan", "pcs": "Stk", "piece": "Stück",
       "aria.menuOpen": "Menü öffnen", "aria.menuClose": "Menü schließen",
+      "theme.toLight": "Helles Design", "theme.toDark": "Dunkles Design",
       "allergens": ["Glutenhaltiges Getreide", "Krebstiere", "Eier", "Fisch", "Erdnüsse", "Soja", "Milch und Laktose", "Schalenfrüchte", "Sellerie", "Senf", "Sesam", "Schwefeldioxid & Sulfite", "Lupinen", "Weichtiere"]
     },
     en: {
@@ -84,6 +86,7 @@
       "spice.levels": ["Not spicy", "Mild", "Extra hot", "Asian hot", "Extremely hot"],
       "vegan": "Vegan", "pcs": "pcs", "piece": "piece",
       "aria.menuOpen": "Open menu", "aria.menuClose": "Close menu",
+      "theme.toLight": "Light mode", "theme.toDark": "Dark mode",
       "allergens": ["Cereals containing gluten", "Crustaceans", "Eggs", "Fish", "Peanuts", "Soy", "Milk & lactose", "Tree nuts", "Celery", "Mustard", "Sesame", "Sulphur dioxide & sulphites", "Lupin", "Molluscs"]
     }
   };
@@ -99,7 +102,7 @@
             de: "Frische handgezogene Weizennudeln in hausgemachter Brühe, serviert mit hausgemachter Biang-Biang-Chilisauce, frischem Chili, Koriander, Frühlingszwiebeln und aromatischem Zwiebelöl.",
             en: "Fresh hand-pulled wheat noodles in homemade broth, served with our homemade Biang Biang chili sauce, fresh chili, coriander, spring onions and fragrant onion oil."
           },
-          img: "images/biang.jpg", spice: true,
+           spice: true,
           items: [
             { c: "B1", de: "Rindfleisch", en: "Beef", p: 16.5 },
             { c: "B2", de: "Hausgeschmortes Schweinekotelett", en: "House-braised pork chop", p: 15.8 },
@@ -113,7 +116,7 @@
             de: "Frische handgezogene Weizennudeln in hausgemachter Brühe mit unserer Spezial-Haussauce, Tomaten-Knoblauch-Sauce, eingelegtem Senfkohl und frischem Koriander.",
             en: "Fresh hand-pulled wheat noodles in homemade broth with our special house sauce, tomato-garlic sauce, pickled mustard greens and fresh coriander."
           },
-          img: "images/beefsoup.jpg",
+          
           items: [
             { c: "K1", de: "Rindfleisch", en: "Beef", p: 16.5 },
             { c: "K2", de: "Hausgeschmortes Schweinekotelett", en: "House-braised pork chop", p: 15.8 },
@@ -141,7 +144,7 @@
       id: "rice", label: { de: "Reisschalen", en: "Rice bowls" },
       groups: [
         {
-          title: { de: "Reisschalen", en: "Rice bowls" }, img: "images/beefrice.jpg", single: true,
+          title: { de: "Reisschalen", en: "Rice bowls" },  single: true,
           items: [
             { c: "G1", de: "Geschmortes Rindfleisch", en: "Braised beef", p: 16.5 },
             { c: "G2", de: "Mapo Tofu", en: "Mapo tofu", p: 14.8 },
@@ -156,7 +159,7 @@
       id: "dumplings", label: { de: "Dumplings & Vorspeisen", en: "Dumplings & starters" },
       groups: [
         {
-          title: { de: "Dumplings", en: "Dumplings" }, img: "images/dumplings.jpg",
+          title: { de: "Dumplings", en: "Dumplings" }, 
           items: [
             { c: "D1", de: "Schweinefleisch-Schnittlauch-Dumplings", en: "Pork & chive dumplings", q: 5, p: 6.5 },
             { c: "D2", de: "Gemüse-Dumplings", en: "Vegetable dumplings", q: 5, p: 5.5 },
@@ -169,7 +172,7 @@
           ]
         },
         {
-          title: { de: "Kalte Vorspeisen", en: "Cold starters" }, img: "images/cucumber.jpg",
+          title: { de: "Kalte Vorspeisen", en: "Cold starters" }, 
           items: [
             { c: "C1", de: "Chinesischer Gurkensalat", en: "Chinese cucumber salad", p: 5.5 },
             { c: "C2", de: "Rindfleischsalat", en: "Beef salad", p: 6.5 }
@@ -181,7 +184,7 @@
       id: "bao", label: { de: "Bao", en: "Bao" },
       groups: [
         {
-          title: { de: "Bao · Gedämpfte Teigtaschen", en: "Bao · steamed buns" }, img: "images/bao.jpg", single: true,
+          title: { de: "Bao · Gedämpfte Teigtaschen", en: "Bao · steamed buns" },  single: true,
           items: [
             { c: "BAO01", de: "Großer Bao (Schwein oder Rind)", en: "Large bao (pork or beef)", n: 1, p: 3.8 },
             { c: "BAO02", de: "Großer Bao (Schwein oder Rind)", en: "Large bao (pork or beef)", n: 2, p: 6.9 },
@@ -270,6 +273,7 @@
     });
     var burger = $("#burger");
     burger.setAttribute("aria-label", t(burger.getAttribute("aria-expanded") === "true" ? "aria.menuClose" : "aria.menuOpen"));
+    syncThemeToggle();
     renderMenu();
     renderHours();
     renderAllergens();
@@ -312,7 +316,6 @@
   function renderGroup(g) {
     return '<div class="group">' +
       '<div class="group__head">' +
-      (g.img ? '<img class="group__img" src="' + g.img + '" alt="" loading="lazy" />' : "") +
       '<div><h3 class="group__title">' + esc(g.title[lang]) + "</h3>" +
       (g.desc ? '<p class="group__desc">' + esc(g.desc[lang]) + "</p>" : "") + "</div></div>" +
       (g.spice ? renderSpice() : "") +
@@ -493,6 +496,52 @@
     });
   }
 
+  // Hero video: muted autoplay loop, pause/play button, respects reduced motion
+  function initHeroVideo() {
+    var v = $("[data-hero-video]"), btn = $("[data-hero-toggle]");
+    if (!v || !btn) return;
+    v.muted = true;
+    function sync() { btn.classList.toggle("is-paused", v.paused); btn.setAttribute("aria-pressed", v.paused); }
+    function play() { var p = v.play(); if (p && p.catch) p.catch(function () {}); }
+    btn.addEventListener("click", function () { if (v.paused) play(); else v.pause(); });
+    v.addEventListener("play", sync); v.addEventListener("pause", sync);
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) v.pause(); else play();
+    // don't decode video while the hero is off-screen
+    if ("IntersectionObserver" in window) {
+      var userPaused = false;
+      btn.addEventListener("click", function () { userPaused = v.paused; });
+      new IntersectionObserver(function (en) {
+        if (en[0].isIntersecting) { if (!userPaused && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) play(); }
+        else v.pause();
+      }, { threshold: 0.05 }).observe(v);
+    }
+    sync();
+  }
+
+  // Appearance: dark (Tusche) by default, light (Zinnober) on request
+  var THEME_COLOR = { dark: "#100f0d", light: "#fbf7ef" };
+  function isLight() { return document.documentElement.getAttribute("data-theme") === "light"; }
+  function syncThemeToggle() {
+    var btn = $("[data-theme-toggle]");
+    if (!btn) return;
+    var label = t(isLight() ? "theme.toDark" : "theme.toLight");
+    btn.setAttribute("aria-pressed", isLight());
+    btn.setAttribute("aria-label", label);
+    btn.title = label;
+  }
+  function setTheme(mode) {
+    var root = document.documentElement, meta = $('meta[name="theme-color"]');
+    if (mode === "light") root.setAttribute("data-theme", "light"); else root.removeAttribute("data-theme");
+    if (meta) meta.setAttribute("content", THEME_COLOR[mode]);
+    store("mk-theme", mode);
+    syncThemeToggle();
+  }
+  function initTheme() {
+    var btn = $("[data-theme-toggle]");
+    if (btn) btn.addEventListener("click", function () { setTheme(isLight() ? "dark" : "light"); });
+    syncThemeToggle();
+  }
+
   /* ================= INIT ================= */
 
   document.documentElement.classList.remove("no-js");
@@ -509,5 +558,7 @@
   initScrollEffects();
   initLightbox();
   initMap();
+  initHeroVideo();
+  initTheme();
   setInterval(updateStatus, 60 * 1000);
 })();
